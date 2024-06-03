@@ -42,6 +42,11 @@ Jalankan skrip dengan video sumber dan jalur file output:
 ```bash
 python main.py
 ```
+Video Testing dan Hasil:
+```bash
+[python main.py](https://drive.google.com/drive/folders/10QHum9JRIr6-oki9SrXDmsCdzLbt-c-z?usp=drive_link)
+```
+
 
 ## Penjelasan Kode
 
@@ -238,7 +243,7 @@ speed = distance / time * 3.6
 ```
 
 ## Lisensi
-Proyek ini dilisensikan di bawah Lisensi MIT - lihat file [LICENSE](LICENSE) untuk detail lebih lanjut.
+Proyek ini adalah tugas uas mata kuliah Visi Komputer.
 ```
 
 Silakan sesuaikan konten ini dengan detail spesifik proyek Anda dan kebutuhan Anda.
