@@ -44,7 +44,7 @@ python main.py
 ```
 Video Testing dan Hasil:
 ```bash
-[python main.py](https://drive.google.com/drive/folders/10QHum9JRIr6-oki9SrXDmsCdzLbt-c-z?usp=drive_link)
+https://drive.google.com/drive/folders/10QHum9JRIr6-oki9SrXDmsCdzLbt-c-z?usp=drive_link
 ```
 
 
