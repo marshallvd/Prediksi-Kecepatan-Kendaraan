@@ -4,7 +4,9 @@ import numpy as np
 from ultralytics import YOLO
 import supervision as sv
 
-SOURCE = np.array([[-2000, 800], [7000, 803], [5039, 2159], [40, 2159]])
+# SOURCE = np.array([[-500, 2500], [5900, 2500], [1900, 600], [1500, 600]]) #Vehicles.mp4
+#kiri bawah, pojok kanan bawah, pojok kanan atas, kiri atas
+SOURCE = np.array([[50, 1100], [1600, 1100], [1700, 200], [1200, 200]]) #cctv
 
 TARGET_WIDTH = 25
 TARGET_HEIGHT = 250
@@ -33,14 +35,14 @@ class ViewTransformer:
         return transformed_points.reshape(-1, 2)
 
 if __name__ == "__main__":
-    # Atur path video sumber dan target langsung di dalam kode
-    source_video_path = "vehicles.mp4"
-    target_video_path = "vehinjay.mp4"
+    source_video_path = "cctv2.mp4"
+    target_video_path = "cctv hasil1.mp4"
     confidence_threshold = 0.3
     iou_threshold = 0.7
 
     video_info = sv.VideoInfo.from_video_path(video_path=source_video_path)
     model = YOLO("yolov8x.pt")
+    
 
     byte_track = sv.ByteTrack(
         frame_rate=video_info.fps, track_thresh=confidence_threshold
@@ -69,6 +71,9 @@ if __name__ == "__main__":
 
     coordinates = defaultdict(lambda: deque(maxlen=video_info.fps))
 
+    vehicle_counts = defaultdict(int)
+    counted_vehicles = set()
+
     with sv.VideoSink(target_video_path, video_info) as sink:
         for frame in frame_generator:
             result = model(frame)[0]
@@ -84,11 +89,17 @@ if __name__ == "__main__":
             )
             points = view_transformer.transform_points(points=points).astype(int)
 
-            for tracker_id, [_, y] in zip(detections.tracker_id, points):
-                coordinates[tracker_id].append(y)
-
             labels = []
-            for tracker_id in detections.tracker_id:
+            for tracker_id, [_, y], class_id in zip(detections.tracker_id, points, detections.class_id):
+                if tracker_id not in counted_vehicles:
+                    if class_id == 2:  # Assuming class 2 is 'car'
+                        vehicle_counts['car'] += 1
+                        counted_vehicles.add(tracker_id)
+                    elif class_id == 7:  # Assuming class 7 is 'truck'
+                        vehicle_counts['truck'] += 1
+                        counted_vehicles.add(tracker_id)
+
+                coordinates[tracker_id].append(y)
                 if len(coordinates[tracker_id]) < video_info.fps / 2:
                     labels.append(f"#{tracker_id}")
                 else:
@@ -109,6 +120,14 @@ if __name__ == "__main__":
             annotated_frame = label_annotator.annotate(
                 scene=annotated_frame, detections=detections, labels=labels
             )
+
+            # Draw detection zone
+            cv2.polylines(annotated_frame, [SOURCE.astype(np.int32)], isClosed=True, color=(255, 0, 0), thickness=2)  # Blue color for detection zone
+            # Display vehicle counts in top left corner with different colors
+            car_text = f"Cars: {vehicle_counts['car']}"
+            truck_text = f"Trucks: {vehicle_counts['truck']}"
+            cv2.putText(annotated_frame, car_text, (30, 50), cv2.FONT_HERSHEY_SIMPLEX, text_scale, (0, 0, 255), thickness)  # Red color for cars
+            cv2.putText(annotated_frame, truck_text, (30, 120), cv2.FONT_HERSHEY_SIMPLEX, text_scale, (0, 255, 0), thickness)  # Green color for trucks
 
             sink.write_frame(annotated_frame)
             cv2.imshow("frame", annotated_frame)
