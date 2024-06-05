@@ -200,9 +200,7 @@ if __name__ == "__main__":
             car_text = f"Cars: {vehicle_counts['car']}"
             truck_text = f"Trucks: {vehicle_counts['truck']}"
             cv2.putText(annotated_frame, car_text, (30, 50), cv2.FONT_HERSHEY_SIMPLEX, text_scale, (0, 0, 255), thickness)  # Warna merah untuk mobil
-            cv2.putText(annotated_frame, truck_text, (30, 120), cv2.FONT_HERSHEY_SIMPLEX, text_scale, (0, 255, 0), thickness)  # Warna hij
-
-au untuk truk
+            cv2.putText(annotated_frame, truck_text, (30, 120), cv2.FONT_HERSHEY_SIMPLEX, text_scale, (0, 255, 0), thickness)  # Warna hijau untuk truk
 
             sink.write_frame(annotated_frame)
             cv2.imshow("frame", annotated_frame)
